@@ -37,7 +37,7 @@ public class SkillProfiles extends JavaPlugin implements IOComponent {
 	public void onEnable() {
 		Bukkit.getServer().getLogger().info("FoPzlSkillProfiles Enabled");
 		this.getCommand("skillprofile").setExecutor(new Commands(this));
-		NeoCore.registerIOComponent(this, this);
+		NeoCore.registerIOComponent(this, this, "SkillProfiles");
 	}
 	
 	public void onDisable() {
@@ -220,7 +220,7 @@ public class SkillProfiles extends JavaPlugin implements IOComponent {
 		if(!playerProfiles.containsKey(uuid)) return;
 		
 		try {
-			Statement baseStmt = NeoCore.getStatement();
+			Statement baseStmt = NeoCore.getStatement("SkillProfiles");
 			baseStmt.executeUpdate("delete from skillprofiles_profile where uuid = '" + uuid + "';");
 			// FK constraint ensures rows in other tables are deleted as well
 			
@@ -272,11 +272,6 @@ public class SkillProfiles extends JavaPlugin implements IOComponent {
 	
 	@Override
 	public void cleanup(Statement insert, Statement delete) {}
-	
-	@Override
-	public String getKey() {
-		return "SkillProfiles";
-	}
 
 	@Override
 	public void preloadPlayer(OfflinePlayer arg0, Statement arg1) {}
