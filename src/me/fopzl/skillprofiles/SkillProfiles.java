@@ -22,8 +22,8 @@ import com.sucy.skill.api.player.PlayerSkill;
 import com.sucy.skill.api.player.PlayerSkillBar;
 import com.sucy.skill.api.skills.Skill;
 
-import me.neoblade298.neocore.NeoCore;
-import me.neoblade298.neocore.io.IOComponent;
+import me.neoblade298.neocore.bukkit.NeoCore;
+import me.neoblade298.neocore.bukkit.io.IOComponent;
 import me.neoblade298.neoresearch.Research;
 import me.neoblade298.neoresearch.StoredAttributes;
 
@@ -452,7 +452,7 @@ class AccountProfiles {
 class Profile {
 	HashMap<String, Integer> attributes;
 	HashMap<String, Integer> researchAttributes;
-	HashMap<String, Integer> skillLevels; // TODO: research skills?
+	HashMap<String, Integer> skillLevels;
 	HashMap<String, Material> skillBinds;
 	HashMap<Integer, String> skillBar;
 	
