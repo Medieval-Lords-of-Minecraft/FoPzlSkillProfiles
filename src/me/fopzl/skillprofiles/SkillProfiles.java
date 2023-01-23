@@ -219,55 +219,53 @@ public class SkillProfiles extends JavaPlugin implements IOComponent {
 		UUID uuid = p.getUniqueId();
 		if(!playerProfiles.containsKey(uuid)) return;
 		
-		try {
-			Statement baseStmt = NeoCore.getStatement("SkillProfiles");
-			baseStmt.executeUpdate("delete from skillprofiles_profile where uuid = '" + uuid + "';");
-			// FK constraint ensures rows in other tables are deleted as well
-			
-			for(Map.Entry<Integer, AccountProfiles> ppEntry : playerProfiles.get(uuid).profiles.entrySet()) {
-				for(Map.Entry<String, Profile> apEntry : ppEntry.getValue().profiles.entrySet()) {
-					String keyString = "'" + uuid + "', " + ppEntry.getKey() + ", '" + apEntry.getKey() + "'";
-					
-					baseStmt.executeUpdate("replace into skillprofiles_profile values (" + keyString + ");");
-					
-					Profile prof = apEntry.getValue();
-					/* attributes */
-					//delete.addBatch("delete from skillprofiles_attribute where prof_uuid = '" + uuid + "';");
-					for(Map.Entry<String, Integer> attrEntry : prof.attributes.entrySet()) {
-						insert.addBatch("replace into skillprofiles_attribute values (" + keyString + ", '" + attrEntry.getKey() + "', " + attrEntry.getValue() + ");");
-					}
-					
-					/* research attributes */
-					//delete.addBatch("delete from skillprofiles_researchattribute where prof_uuid = '" + uuid + "';");
-					for(Map.Entry<String, Integer> rattrEntry : prof.researchAttributes.entrySet()) {
-						insert.addBatch("replace into skillprofiles_researchattribute values (" + keyString + ", '" + rattrEntry.getKey() + "', " + rattrEntry.getValue() + ");");
-					}
-					
-					/* skill levels */
-					//delete.addBatch("delete from skillprofiles_skillLevel where prof_uuid = '" + uuid + "';");
-					for(Map.Entry<String, Integer> skillEntry : prof.skillLevels.entrySet()) {
-						insert.addBatch("replace into skillprofiles_skillLevel values (" + keyString + ", '" + Util.sqlEscape(skillEntry.getKey()) + "', " + skillEntry.getValue() + ");");
-					}
-					
-					/* skill binds */
-					//delete.addBatch("delete from skillprofiles_skillBind where prof_uuid = '" + uuid + "';");
-					for(Map.Entry<String, Material> bindEntry : prof.skillBinds.entrySet()) {
-						insert.addBatch("replace into skillprofiles_skillBind values (" + keyString + ", '" + Util.sqlEscape(bindEntry.getKey()) + "', '" + bindEntry.getValue().toString() + "');");
-					}
-					
-					/* skill bar */
-					//delete.addBatch("delete from skillprofiles_skillBarSlot where prof_uuid = '" + uuid + "';");
-					for(Map.Entry<Integer, String> slotEntry : prof.skillBar.entrySet()) {
-						insert.addBatch("replace into skillprofiles_skillBarSlot values (" + keyString + ", " + slotEntry.getKey() + ", '" + Util.sqlEscape(slotEntry.getValue()) + "');");
+		NeoCore.runSql("SkillProfiles", (baseStmt) -> {
+			try {
+				baseStmt.executeUpdate("delete from skillprofiles_profile where uuid = '" + uuid + "';");
+				// FK constraint ensures rows in other tables are deleted as well
+				
+				for(Map.Entry<Integer, AccountProfiles> ppEntry : playerProfiles.get(uuid).profiles.entrySet()) {
+					for(Map.Entry<String, Profile> apEntry : ppEntry.getValue().profiles.entrySet()) {
+						String keyString = "'" + uuid + "', " + ppEntry.getKey() + ", '" + apEntry.getKey() + "'";
+						
+						baseStmt.executeUpdate("replace into skillprofiles_profile values (" + keyString + ");");
+						
+						Profile prof = apEntry.getValue();
+						/* attributes */
+						//delete.addBatch("delete from skillprofiles_attribute where prof_uuid = '" + uuid + "';");
+						for(Map.Entry<String, Integer> attrEntry : prof.attributes.entrySet()) {
+							insert.addBatch("replace into skillprofiles_attribute values (" + keyString + ", '" + attrEntry.getKey() + "', " + attrEntry.getValue() + ");");
+						}
+						
+						/* research attributes */
+						//delete.addBatch("delete from skillprofiles_researchattribute where prof_uuid = '" + uuid + "';");
+						for(Map.Entry<String, Integer> rattrEntry : prof.researchAttributes.entrySet()) {
+							insert.addBatch("replace into skillprofiles_researchattribute values (" + keyString + ", '" + rattrEntry.getKey() + "', " + rattrEntry.getValue() + ");");
+						}
+						
+						/* skill levels */
+						//delete.addBatch("delete from skillprofiles_skillLevel where prof_uuid = '" + uuid + "';");
+						for(Map.Entry<String, Integer> skillEntry : prof.skillLevels.entrySet()) {
+							insert.addBatch("replace into skillprofiles_skillLevel values (" + keyString + ", '" + Util.sqlEscape(skillEntry.getKey()) + "', " + skillEntry.getValue() + ");");
+						}
+						
+						/* skill binds */
+						//delete.addBatch("delete from skillprofiles_skillBind where prof_uuid = '" + uuid + "';");
+						for(Map.Entry<String, Material> bindEntry : prof.skillBinds.entrySet()) {
+							insert.addBatch("replace into skillprofiles_skillBind values (" + keyString + ", '" + Util.sqlEscape(bindEntry.getKey()) + "', '" + bindEntry.getValue().toString() + "');");
+						}
+						
+						/* skill bar */
+						//delete.addBatch("delete from skillprofiles_skillBarSlot where prof_uuid = '" + uuid + "';");
+						for(Map.Entry<Integer, String> slotEntry : prof.skillBar.entrySet()) {
+							insert.addBatch("replace into skillprofiles_skillBarSlot values (" + keyString + ", " + slotEntry.getKey() + ", '" + Util.sqlEscape(slotEntry.getValue()) + "');");
+						}
 					}
 				}
-			}
-			
-			baseStmt.close();
-		} catch (SQLException e) {
-			Bukkit.getLogger().warning("Failed to save skill profiles for user " + p.getName());
-			e.printStackTrace();
-		}
+			} catch (SQLException e) {
+				Bukkit.getLogger().warning("Failed to save skill profiles for user " + p.getName());
+				e.printStackTrace();
+			}});
 	}
 	
 	@Override
